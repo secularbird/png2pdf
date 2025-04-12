@@ -21,10 +21,18 @@ def show_preview(index):
     if 0 <= index < len(images):
         img_path = images[index]
         img = Image.open(img_path)
-        img.thumbnail((200, 200))  # Resize for preview
+        canvas_width = canvas_preview.winfo_width()
+        canvas_height = canvas_preview.winfo_height()
+        img.thumbnail((canvas_width, canvas_height))  # Resize to fit canvas
         img_tk = ImageTk.PhotoImage(img)
         canvas_preview.image = img_tk  # Keep a reference to avoid garbage collection
+        canvas_preview.delete("all")  # Clear previous image
         canvas_preview.create_image(0, 0, anchor=tk.NW, image=img_tk)
+
+def on_canvas_resize(event):
+    if listbox_images.curselection():
+        index = listbox_images.curselection()[0]
+        show_preview(index)
 
 def on_listbox_select(event):
     if listbox_images.curselection():
@@ -109,6 +117,7 @@ listbox_images.bind("<<ListboxSelect>>", on_listbox_select)  # Bind selection ev
 
 canvas_preview = tk.Canvas(frame, bg="gray")  # Canvas for preview
 canvas_preview.grid(row=0, column=1, sticky="nsew", padx=10, pady=10)
+canvas_preview.bind("<Configure>", on_canvas_resize)  # Bind resize event
 
 btn_frame = tk.Frame(root)  # Frame for move buttons
 btn_frame.grid(row=2, column=0, columnspan=2, pady=10)

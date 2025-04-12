@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import filedialog, messagebox
+from tkinter import ttk, filedialog, messagebox  # Import ttk for Treeview
 from PIL import Image, ImageTk  # Import ImageTk for preview
 
 def select_images():
@@ -12,10 +12,16 @@ def select_images():
         images.clear()
         images.extend(file_paths)
         lbl_selected.config(text=f"已选择 {len(images)} 张图片")
-        listbox_images.delete(0, tk.END)  # Clear the listbox
-        for img in images:
-            listbox_images.insert(tk.END, img)  # Add each image to the listbox
+        update_treeview()  # Update the Treeview with the new order
         show_preview(0)  # Show preview of the first image
+
+def update_treeview():
+    """Update the Treeview to display the current order of images with truncated paths."""
+    treeview_images.delete(*treeview_images.get_children())  # Clear the Treeview
+    max_path_length = int(treeview_images.column("Path", "width") * 0.2)  # 20% of column width
+    for i, img in enumerate(images):
+        truncated_path = img if len(img) <= max_path_length else f"...{img[-max_path_length:]}"
+        treeview_images.insert("", "end", values=(i + 1, truncated_path))  # Add order and truncated filename
 
 def show_preview(index):
     if 0 <= index < len(images):
@@ -30,42 +36,37 @@ def show_preview(index):
         canvas_preview.create_image(0, 0, anchor=tk.NW, image=img_tk)
 
 def on_canvas_resize(event):
-    if listbox_images.curselection():
-        index = listbox_images.curselection()[0]
+    if treeview_images.selection():
+        index = treeview_images.index(treeview_images.selection()[0])
         show_preview(index)
 
-def on_listbox_select(event):
-    if listbox_images.curselection():
-        index = listbox_images.curselection()[0]
+def on_treeview_select(event):
+    selected_item = treeview_images.selection()
+    if selected_item:
+        index = treeview_images.index(selected_item[0])
         show_preview(index)
 
 def move_up():
-    selected = listbox_images.curselection()
-    if selected and selected[0] > 0:
-        index = selected[0]
-        # Swap in the images list
-        images[index], images[index - 1] = images[index - 1], images[index]
-        # Update the Listbox
-        listbox_images.delete(0, tk.END)
-        for img in images:
-            listbox_images.insert(tk.END, img)
-        # Reselect the moved item
-        listbox_images.select_set(index - 1)
-        show_preview(index - 1)
+    selected_item = treeview_images.selection()
+    if selected_item:
+        index = treeview_images.index(selected_item[0])
+        if index > 0:
+            # Swap in the images list
+            images[index], images[index - 1] = images[index - 1], images[index]
+            update_treeview()  # Update the Treeview with the new order
+            treeview_images.selection_set(treeview_images.get_children()[index - 1])  # Reselect the moved item
+            show_preview(index - 1)
 
 def move_down():
-    selected = listbox_images.curselection()
-    if selected and selected[0] < len(images) - 1:
-        index = selected[0]
-        # Swap in the images list
-        images[index], images[index + 1] = images[index + 1], images[index]
-        # Update the Listbox
-        listbox_images.delete(0, tk.END)
-        for img in images:
-            listbox_images.insert(tk.END, img)
-        # Reselect the moved item
-        listbox_images.select_set(index + 1)
-        show_preview(index + 1)
+    selected_item = treeview_images.selection()
+    if selected_item:
+        index = treeview_images.index(selected_item[0])
+        if index < len(images) - 1:
+            # Swap in the images list
+            images[index], images[index + 1] = images[index + 1], images[index]
+            update_treeview()  # Update the Treeview with the new order
+            treeview_images.selection_set(treeview_images.get_children()[index + 1])  # Reselect the moved item
+            show_preview(index + 1)
 
 def convert_to_pdf():
     if not images:
@@ -92,8 +93,8 @@ def convert_to_pdf():
 root = tk.Tk()
 root.title("图片转PDF")
 
-# Use grid layout for better responsiveness
-root.rowconfigure(1, weight=1)  # Allow resizing of the frame containing the listbox and canvas
+# Configure root window to allow resizing
+root.rowconfigure(1, weight=1)  # Allow resizing of the frame containing the Treeview and canvas
 root.columnconfigure(0, weight=1)
 
 images = []
@@ -107,13 +108,17 @@ lbl_selected.grid(row=0, column=1, pady=10, padx=10, sticky="ew")  # Expand hori
 
 frame = tk.Frame(root)
 frame.grid(row=1, column=0, columnspan=2, sticky="nsew")  # Expand in all directions
-frame.rowconfigure(0, weight=1)
-frame.columnconfigure(0, weight=3)  # Listbox takes more space
+frame.rowconfigure(0, weight=1)  # Allow Treeview and Canvas to resize vertically
+frame.columnconfigure(0, weight=3)  # Treeview takes more space
 frame.columnconfigure(1, weight=1)  # Canvas takes less space
 
-listbox_images = tk.Listbox(frame, height=8)  # Listbox to display images
-listbox_images.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
-listbox_images.bind("<<ListboxSelect>>", on_listbox_select)  # Bind selection event
+treeview_images = ttk.Treeview(frame, columns=("Order", "Path"), show="headings", height=8)
+treeview_images.heading("Order", text="顺序")
+treeview_images.heading("Path", text="图片路径")
+treeview_images.column("Order", width=50, anchor="center")  # Adjust column width
+treeview_images.column("Path", width=400, anchor="w")  # Adjust column width
+treeview_images.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+treeview_images.bind("<<TreeviewSelect>>", on_treeview_select)  # Bind selection event
 
 canvas_preview = tk.Canvas(frame, bg="gray")  # Canvas for preview
 canvas_preview.grid(row=0, column=1, sticky="nsew", padx=10, pady=10)
@@ -121,6 +126,7 @@ canvas_preview.bind("<Configure>", on_canvas_resize)  # Bind resize event
 
 btn_frame = tk.Frame(root)  # Frame for move buttons
 btn_frame.grid(row=2, column=0, columnspan=2, pady=10)
+btn_frame.columnconfigure(0, weight=1)  # Allow buttons to resize horizontally
 
 btn_move_up = tk.Button(btn_frame, text="上移", command=move_up)  # Move Up button
 btn_move_up.pack(side=tk.LEFT, padx=5)

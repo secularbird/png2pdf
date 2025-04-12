@@ -31,6 +31,34 @@ def on_listbox_select(event):
         index = listbox_images.curselection()[0]
         show_preview(index)
 
+def move_up():
+    selected = listbox_images.curselection()
+    if selected and selected[0] > 0:
+        index = selected[0]
+        # Swap in the images list
+        images[index], images[index - 1] = images[index - 1], images[index]
+        # Update the Listbox
+        listbox_images.delete(0, tk.END)
+        for img in images:
+            listbox_images.insert(tk.END, img)
+        # Reselect the moved item
+        listbox_images.select_set(index - 1)
+        show_preview(index - 1)
+
+def move_down():
+    selected = listbox_images.curselection()
+    if selected and selected[0] < len(images) - 1:
+        index = selected[0]
+        # Swap in the images list
+        images[index], images[index + 1] = images[index + 1], images[index]
+        # Update the Listbox
+        listbox_images.delete(0, tk.END)
+        for img in images:
+            listbox_images.insert(tk.END, img)
+        # Reselect the moved item
+        listbox_images.select_set(index + 1)
+        show_preview(index + 1)
+
 def convert_to_pdf():
     if not images:
         messagebox.showwarning("警告", "请先选择图片！")
@@ -55,29 +83,44 @@ def convert_to_pdf():
 # 主窗口
 root = tk.Tk()
 root.title("图片转PDF")
-root.geometry("600x400")  # Adjusted size to fit the preview
+
+# Use grid layout for better responsiveness
+root.rowconfigure(1, weight=1)  # Allow resizing of the frame containing the listbox and canvas
+root.columnconfigure(0, weight=1)
 
 images = []
 
 # 按钮和标签
 btn_select = tk.Button(root, text="选择图片", command=select_images)
-btn_select.pack(pady=10)
+btn_select.grid(row=0, column=0, pady=10, padx=10, sticky="ew")  # Expand horizontally
 
 lbl_selected = tk.Label(root, text="未选择图片")
-lbl_selected.pack(pady=5)
+lbl_selected.grid(row=0, column=1, pady=10, padx=10, sticky="ew")  # Expand horizontally
 
 frame = tk.Frame(root)
-frame.pack(pady=10)
+frame.grid(row=1, column=0, columnspan=2, sticky="nsew")  # Expand in all directions
+frame.rowconfigure(0, weight=1)
+frame.columnconfigure(0, weight=3)  # Listbox takes more space
+frame.columnconfigure(1, weight=1)  # Canvas takes less space
 
-listbox_images = tk.Listbox(frame, height=8, width=50)  # Listbox to display images
-listbox_images.pack(side=tk.LEFT, padx=10)
+listbox_images = tk.Listbox(frame, height=8)  # Listbox to display images
+listbox_images.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
 listbox_images.bind("<<ListboxSelect>>", on_listbox_select)  # Bind selection event
 
-canvas_preview = tk.Canvas(frame, width=200, height=200, bg="gray")  # Canvas for preview
-canvas_preview.pack(side=tk.RIGHT)
+canvas_preview = tk.Canvas(frame, bg="gray")  # Canvas for preview
+canvas_preview.grid(row=0, column=1, sticky="nsew", padx=10, pady=10)
+
+btn_frame = tk.Frame(root)  # Frame for move buttons
+btn_frame.grid(row=2, column=0, columnspan=2, pady=10)
+
+btn_move_up = tk.Button(btn_frame, text="上移", command=move_up)  # Move Up button
+btn_move_up.pack(side=tk.LEFT, padx=5)
+
+btn_move_down = tk.Button(btn_frame, text="下移", command=move_down)  # Move Down button
+btn_move_down.pack(side=tk.LEFT, padx=5)
 
 btn_convert = tk.Button(root, text="转换为PDF", command=convert_to_pdf)
-btn_convert.pack(pady=20)
+btn_convert.grid(row=3, column=0, columnspan=2, pady=10, padx=10, sticky="ew")  # Expand horizontally
 
 root.mainloop()
 

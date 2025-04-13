@@ -47,22 +47,12 @@ def delete_image(index=None):
     canvas_preview.delete("all")  # Clear the preview if images are deleted
 
 def update_treeview():
-    """Update the Treeview to display the current order of images with action buttons."""
+    """Update the Treeview to display the current order of images."""
     treeview_images.delete(*treeview_images.get_children())  # Clear the Treeview
     max_path_length = int(treeview_images.column("Path", "width") * 0.2)  # 20% of column width
     for i, img in enumerate(images):
         truncated_path = img if len(img) <= max_path_length else f"...{img[-max_path_length:]}"
-        treeview_images.insert("", "end", values=(i + 1, truncated_path, ""))  # Add order, truncated filename, and placeholder
-    update_action_buttons()
-
-def update_action_buttons():
-    """Place action buttons in the Treeview."""
-    for i, item in enumerate(treeview_images.get_children()):
-        bbox = treeview_images.bbox(item, column=2)  # Get bounding box for the action column
-        if bbox:
-            x, y, width, height = bbox
-            btn_delete = tk.Button(treeview_images, text="删除", command=lambda idx=i: delete_image(idx))
-            btn_delete.place(x=x + 5, y=y + 2, width=40, height=height - 4)
+        treeview_images.insert("", "end", values=(i + 1, truncated_path))  # Add order and truncated filename
 
 def show_preview(index):
     if 0 <= index < len(images):
@@ -169,13 +159,11 @@ frame.rowconfigure(0, weight=1)  # Allow Treeview and Canvas to resize verticall
 frame.columnconfigure(0, weight=3)  # Treeview takes more space
 frame.columnconfigure(1, weight=1)  # Canvas takes less space
 
-treeview_images = ttk.Treeview(frame, columns=("Order", "Path", "Actions"), show="headings", height=8)
+treeview_images = ttk.Treeview(frame, columns=("Order", "Path"), show="headings", height=8)
 treeview_images.heading("Order", text="顺序")
 treeview_images.heading("Path", text="图片路径")
-treeview_images.heading("Actions", text="操作")
 treeview_images.column("Order", width=50, anchor="center")  # Adjust column width
 treeview_images.column("Path", width=400, anchor="w")  # Adjust column width
-treeview_images.column("Actions", width=150, anchor="center")  # Adjust column width
 treeview_images.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
 treeview_images.bind("<<TreeviewSelect>>", on_treeview_select)  # Bind selection event
 treeview_images.bind("<Button-3>", show_context_menu)  # Bind right-click for context menu

@@ -16,3 +16,6 @@ Thumbs.db
 
 # Output files
 *.pdf
+
+dist/
+build/

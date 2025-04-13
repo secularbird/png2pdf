@@ -15,6 +15,17 @@ def select_images():
         update_treeview()  # Update the Treeview with the new order
         show_preview(0)  # Show preview of the first image
 
+def append_images():
+    """Append selected images to the existing list."""
+    file_paths = filedialog.askopenfilenames(
+        title="追加图片",
+        filetypes=[("Image Files", "*.png;*.jpg;*.jpeg;*.bmp;*.gif")]
+    )
+    if file_paths:
+        images.extend(file_paths)  # Append new images to the existing list
+        lbl_selected.config(text=f"已选择 {len(images)} 张图片")
+        update_treeview()  # Update the Treeview with the new order
+
 def update_treeview():
     """Update the Treeview to display the current order of images with truncated paths."""
     treeview_images.delete(*treeview_images.get_children())  # Clear the Treeview
@@ -103,11 +114,14 @@ images = []
 btn_select = tk.Button(root, text="选择图片", command=select_images)
 btn_select.grid(row=0, column=0, pady=10, padx=10, sticky="ew")  # Expand horizontally
 
+btn_append = tk.Button(root, text="追加图片", command=append_images)  # New button to append images
+btn_append.grid(row=0, column=1, pady=10, padx=10, sticky="ew")  # Expand horizontally
+
 lbl_selected = tk.Label(root, text="未选择图片")
-lbl_selected.grid(row=0, column=1, pady=10, padx=10, sticky="ew")  # Expand horizontally
+lbl_selected.grid(row=0, column=2, pady=10, padx=10, sticky="ew")  # Expand horizontally
 
 frame = tk.Frame(root)
-frame.grid(row=1, column=0, columnspan=2, sticky="nsew")  # Expand in all directions
+frame.grid(row=1, column=0, columnspan=3, sticky="nsew")  # Expand in all directions
 frame.rowconfigure(0, weight=1)  # Allow Treeview and Canvas to resize vertically
 frame.columnconfigure(0, weight=3)  # Treeview takes more space
 frame.columnconfigure(1, weight=1)  # Canvas takes less space
@@ -125,7 +139,7 @@ canvas_preview.grid(row=0, column=1, sticky="nsew", padx=10, pady=10)
 canvas_preview.bind("<Configure>", on_canvas_resize)  # Bind resize event
 
 btn_frame = tk.Frame(root)  # Frame for move buttons
-btn_frame.grid(row=2, column=0, columnspan=2, pady=10)
+btn_frame.grid(row=2, column=0, columnspan=3, pady=10)
 btn_frame.columnconfigure(0, weight=1)  # Allow buttons to resize horizontally
 
 btn_move_up = tk.Button(btn_frame, text="上移", command=move_up)  # Move Up button
@@ -135,7 +149,7 @@ btn_move_down = tk.Button(btn_frame, text="下移", command=move_down)  # Move D
 btn_move_down.pack(side=tk.LEFT, padx=5)
 
 btn_convert = tk.Button(root, text="转换为PDF", command=convert_to_pdf)
-btn_convert.grid(row=3, column=0, columnspan=2, pady=10, padx=10, sticky="ew")  # Expand horizontally
+btn_convert.grid(row=3, column=0, columnspan=3, pady=10, padx=10, sticky="ew")  # Expand horizontally
 
 root.mainloop()
 

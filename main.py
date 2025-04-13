@@ -31,17 +31,20 @@ def append_images():
         update_status_bar()  # Update status bar
 
 def delete_image(index=None):
-    """Delete the selected or specified image from the list."""
+    """Delete the selected or specified images from the list."""
     if index is None:
-        selected_item = treeview_images.selection()
-        if selected_item:
-            index = treeview_images.index(selected_item[0])
+        selected_items = treeview_images.selection()
+        if selected_items:
+            indices = [treeview_images.index(item) for item in selected_items]
+            for idx in sorted(indices, reverse=True):  # Delete from the end to avoid index shifting
+                del images[idx]
         else:
             messagebox.showwarning("警告", "请先选择要删除的图片！")
             return
-    del images[index]  # Remove the image from the list
+    else:
+        del images[index]  # Remove the image from the list
     update_treeview()
-    canvas_preview.delete("all")  # Clear the preview if an image is deleted
+    canvas_preview.delete("all")  # Clear the preview if images are deleted
 
 def update_treeview():
     """Update the Treeview to display the current order of images with action buttons."""
@@ -136,7 +139,7 @@ def convert_to_pdf():
 def show_context_menu(event):
     """Show the context menu for Treeview."""
     selected_item = treeview_images.identify_row(event.y)
-    if selected_item:
+    if (selected_item):
         treeview_images.selection_set(selected_item)
         context_menu.post(event.x_root, event.y_root)
 

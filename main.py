@@ -1,15 +1,54 @@
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox  # Import ttk for Treeview
 from PIL import Image, ImageTk  # Import ImageTk for preview
+import os  # Import os to detect system language
+import locale  # Import locale for language settings
+
+# Detect system language
+system_language = locale.getdefaultlocale()[0]
+if system_language.startswith("zh"):  # Simplified Chinese
+    lang = {
+        "select_append": "选择/追加图片",
+        "delete_image": "删除图片",
+        "move_up": "上移",
+        "move_down": "下移",
+        "convert_pdf": "转换为PDF",
+        "status_selected": "已选择图片: ",
+        "warning_select_image": "请先选择图片！",
+        "warning_delete_image": "请先选择要删除的图片！",
+        "success_pdf_saved": "PDF 已保存到\n",
+        "title_save_pdf": "保存 PDF 文件",
+        "title_app": "图片转PDF",
+        "context_menu_delete": "删除图片",
+        "images_treeview_order": "顺序",
+        "images_treeview_path": "图片路径"
+    }
+else:  # Default to English
+    lang = {
+        "select_append": "Select/Append Images",
+        "delete_image": "Delete Image",
+        "move_up": "Move Up",
+        "move_down": "Move Down",
+        "convert_pdf": "Convert to PDF",
+        "status_selected": "Selected Images: ",
+        "warning_select_image": "Please select images first!",  
+        "warning_delete_image": "Please select an image to delete!",
+        "success_pdf_saved": "PDF saved to\n",
+        "title_save_pdf": "Save PDF File",
+        "title_app": "Images to PDF",
+        "context_menu_delete": "Delete Image",
+        "images_treeview_order": "Order",
+        "images_treeview_path": "Image Path"
+    }
 
 def update_status_bar():
     """Update the status bar with the count of selected and appended images."""
-    status_bar.config(text=f"已选择图片: {len(images)}")
+    status_bar.config(text=f"{lang['status_selected']}{len(images)}")
 
 def select_or_append_images():
     """Select or append images to the list."""
     file_paths = filedialog.askopenfilenames(
-        title="选择/追加图片",
+        title=lang["select_append"],
         filetypes=[("Image Files", "*.png;*.jpg;*.jpeg;*.bmp;*.gif")]
     )
     if file_paths:
@@ -28,7 +67,7 @@ def delete_image(index=None):
             for idx in sorted(indices, reverse=True):  # Delete from the end to avoid index shifting
                 del images[idx]
         else:
-            messagebox.showwarning("警告", "请先选择要删除的图片！")
+            messagebox.showwarning(lang["warning_delete_image"], lang["warning_delete_image"])
             return
     else:
         del images[index]  # Remove the image from the list
@@ -96,7 +135,7 @@ def move_down(index=None):
 
 def convert_to_pdf():
     if not images:
-        messagebox.showwarning("警告", "请先选择图片！")
+        messagebox.showwarning(lang["warning_select_image"], lang["warning_select_image"])
         return
 
     img_list = []
@@ -109,11 +148,11 @@ def convert_to_pdf():
     save_path = filedialog.asksaveasfilename(
         defaultextension=".pdf",
         filetypes=[("PDF files", "*.pdf")],
-        title="保存 PDF 文件"
+        title=lang["title_save_pdf"]
     )
     if save_path:
         img_list[0].save(save_path, save_all=True, append_images=img_list[1:])
-        messagebox.showinfo("成功", f"PDF 已保存到\n{save_path}")
+        messagebox.showinfo(lang["success_pdf_saved"], f"{lang['success_pdf_saved']}{save_path}")
 
 def show_context_menu(event):
     """Show the context menu for Treeview."""
@@ -124,7 +163,7 @@ def show_context_menu(event):
 
 # 主窗口
 root = tk.Tk()
-root.title("图片转PDF")
+root.title(lang["title_app"])
 
 # Configure root window to allow resizing
 root.rowconfigure(1, weight=1)  # Allow resizing of the frame containing the Treeview and canvas
@@ -138,10 +177,10 @@ button_frame.grid(row=0, column=0, columnspan=4, pady=10, padx=10, sticky="nsew"
 button_frame.columnconfigure(0, weight=1)  # Equal weight for both buttons
 button_frame.columnconfigure(1, weight=1)
 
-btn_select_or_append = tk.Button(button_frame, text="选择/追加图片", command=select_or_append_images)
+btn_select_or_append = tk.Button(button_frame, text=lang["select_append"], command=select_or_append_images)
 btn_select_or_append.grid(row=0, column=0, padx=5, sticky="nsew")  # Place inside the frame
 
-btn_delete = tk.Button(button_frame, text="删除图片", command=lambda: delete_image())  # Delete Image button
+btn_delete = tk.Button(button_frame, text=lang["delete_image"], command=lambda: delete_image())  # Delete Image button
 btn_delete.grid(row=0, column=1, padx=5, sticky="nsew")  # Place inside the frame
 
 frame = tk.Frame(root, bd=2, relief="solid")  # Add border with solid relief
@@ -152,8 +191,8 @@ frame.columnconfigure(1, weight=0)  # Buttons take minimal space
 frame.columnconfigure(2, weight=1)  # Canvas takes less space
 
 treeview_images = ttk.Treeview(frame, columns=("Order", "Path"), show="headings", height=8)
-treeview_images.heading("Order", text="顺序")
-treeview_images.heading("Path", text="图片路径")
+treeview_images.heading("Order", text=lang["images_treeview_order"])
+treeview_images.heading("Path", text=lang["images_treeview_path"])
 treeview_images.column("Order", width=50, anchor="center")  # Adjust column width
 treeview_images.column("Path", width=400, anchor="w")  # Adjust column width
 treeview_images.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
@@ -169,26 +208,26 @@ btn_frame.rowconfigure(2, weight=1)
 btn_frame.rowconfigure(3, weight=1)
 
 
-btn_move_up = tk.Button(btn_frame, text="上移", command=move_up)  # Move Up button
+btn_move_up = tk.Button(btn_frame, text=lang["move_up"], command=move_up)  # Move Up button
 btn_move_up.grid(row=1, column=0, pady=5)  # Place in the middle row
 
-btn_move_down = tk.Button(btn_frame, text="下移", command=move_down)  # Move Down button
+btn_move_down = tk.Button(btn_frame, text=lang["move_down"], command=move_down)  # Move Down button
 btn_move_down.grid(row=2, column=0, pady=5)  # Place in the middle row
 
 canvas_preview = tk.Canvas(frame, bg="gray")  # Canvas for preview
 canvas_preview.grid(row=0, column=2, sticky="nsew", padx=10, pady=10)
 canvas_preview.bind("<Configure>", on_canvas_resize)  # Bind resize event
 
-btn_convert = tk.Button(root, text="转换为PDF", command=convert_to_pdf)
+btn_convert = tk.Button(root, text=lang["convert_pdf"], command=convert_to_pdf)
 btn_convert.grid(row=3, column=0, columnspan=4, pady=10, padx=10, sticky="ew")  # Expand horizontally
 
 # Add a status bar at the bottom of the window
-status_bar = tk.Label(root, text="已选择图片: 0", anchor="w", relief="sunken")
+status_bar = tk.Label(root, text=f"{lang['status_selected']}0", anchor="w", relief="sunken")
 status_bar.grid(row=4, column=0, columnspan=4, sticky="ew")  # Expand horizontally
 
 # Create a context menu for the Treeview
 context_menu = tk.Menu(root, tearoff=0)
-context_menu.add_command(label="删除图片", command=lambda: delete_image())
+context_menu.add_command(label=lang["context_menu_delete"], command=lambda: delete_image())
 
 if __name__ == "__main__":
     root.mainloop()

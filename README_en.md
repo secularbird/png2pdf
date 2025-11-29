@@ -1,7 +1,10 @@
 # Images to PDF
 
+[![CI](https://github.com/secularbird/png2pdf/actions/workflows/ci.yml/badge.svg)](https://github.com/secularbird/png2pdf/actions/workflows/ci.yml)
+[![Release](https://github.com/secularbird/png2pdf/actions/workflows/release.yml/badge.svg)](https://github.com/secularbird/png2pdf/actions/workflows/release.yml)
+
 ## Introduction
-A cross-platform desktop application built with Tauri 2 and Vue 3 for converting multiple images into a PDF file. Users can select images, adjust their order, preview images, and export them as a PDF file.
+A cross-platform desktop and mobile application built with Tauri 2 and Vue 3 for converting multiple images into a PDF file. Users can select images, adjust their order, preview images, and export them as a PDF file.
 
 ## Tech Stack
 - **Backend**: Tauri 2 (Rust)
@@ -38,10 +41,25 @@ A cross-platform desktop application built with Tauri 2 and Vue 3 for converting
 9. **Dark Mode**
    - Automatically adapts to system dark/light theme.
 
-## System Requirements
-- Windows 10/11
-- macOS 10.15+
-- Linux (WebKit2GTK required)
+## Supported Platforms
+- **Desktop**:
+  - Windows 10/11
+  - macOS 10.15+ (Intel & Apple Silicon)
+  - Linux (WebKit2GTK required)
+- **Mobile**:
+  - Android 7.0+
+
+## Download
+
+Download the installer for your system from the [Releases](https://github.com/secularbird/png2pdf/releases) page:
+
+| Platform | File Type |
+|----------|-----------|
+| Windows | `.msi`, `.exe` |
+| macOS (Apple Silicon) | `.dmg` (aarch64) |
+| macOS (Intel) | `.dmg` (x64) |
+| Linux | `.deb`, `.rpm`, `.AppImage` |
+| Android | `.apk` |
 
 ## Development Setup
 
@@ -52,6 +70,10 @@ A cross-platform desktop application built with Tauri 2 and Vue 3 for converting
   ```bash
   sudo apt install libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev
   ```
+- Android Development (optional):
+  - Android SDK
+  - Android NDK r25c
+  - Java 17
 
 ### Install Dependencies
 ```bash
@@ -59,13 +81,48 @@ npm install
 ```
 
 ### Development
+
+#### Desktop
 ```bash
 npm run tauri dev
 ```
 
+#### Android
+```bash
+npm run tauri android init
+npm run tauri android dev
+```
+
 ### Build
+
+#### Desktop
 ```bash
 npm run tauri build
+```
+
+#### Android
+```bash
+npm run tauri android build
+```
+
+## CI/CD
+
+This project uses GitHub Actions for continuous integration and releases:
+
+- **CI Workflow** (`ci.yml`): Automatically builds and tests on every push and PR
+  - Linux (Ubuntu 22.04)
+  - Windows (latest)
+  - macOS (latest)
+  - Android
+
+- **Release Workflow** (`release.yml`): Automatically builds and releases when version tags are created
+  - Creates GitHub Release automatically
+  - Uploads installers for all platforms
+
+### Creating a New Release
+```bash
+git tag v1.0.0
+git push origin v1.0.0
 ```
 
 ## Interface Description

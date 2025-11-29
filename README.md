@@ -1,7 +1,10 @@
 # 图片转PDF / Images to PDF
 
+[![CI](https://github.com/secularbird/png2pdf/actions/workflows/ci.yml/badge.svg)](https://github.com/secularbird/png2pdf/actions/workflows/ci.yml)
+[![Release](https://github.com/secularbird/png2pdf/actions/workflows/release.yml/badge.svg)](https://github.com/secularbird/png2pdf/actions/workflows/release.yml)
+
 ## 简介
-这是一个基于 Tauri 2 和 Vue 3 的跨平台桌面应用程序，用于将多张图片转换为 PDF 文件。用户可以选择图片、调整顺序、预览图片，并将其导出为 PDF 文件。
+这是一个基于 Tauri 2 和 Vue 3 的跨平台桌面和移动应用程序，用于将多张图片转换为 PDF 文件。用户可以选择图片、调整顺序、预览图片，并将其导出为 PDF 文件。
 
 ## 技术栈
 - **后端**: Tauri 2 (Rust)
@@ -38,10 +41,25 @@
 9. **深色模式**
    - 自动适配系统深色/浅色主题。
 
-## 系统要求
-- Windows 10/11
-- macOS 10.15+
-- Linux (需要 WebKit2GTK)
+## 支持平台
+- **桌面端**:
+  - Windows 10/11
+  - macOS 10.15+ (Intel & Apple Silicon)
+  - Linux (需要 WebKit2GTK)
+- **移动端**:
+  - Android 7.0+
+
+## 下载安装
+
+从 [Releases](https://github.com/secularbird/png2pdf/releases) 页面下载适合您系统的安装包：
+
+| 平台 | 文件类型 |
+|------|----------|
+| Windows | `.msi`, `.exe` |
+| macOS (Apple Silicon) | `.dmg` (aarch64) |
+| macOS (Intel) | `.dmg` (x64) |
+| Linux | `.deb`, `.rpm`, `.AppImage` |
+| Android | `.apk` |
 
 ## 开发环境配置
 
@@ -52,6 +70,10 @@
   ```bash
   sudo apt install libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev
   ```
+- Android 开发 (可选):
+  - Android SDK
+  - Android NDK r25c
+  - Java 17
 
 ### 安装依赖
 ```bash
@@ -59,13 +81,48 @@ npm install
 ```
 
 ### 开发运行
+
+#### 桌面版
 ```bash
 npm run tauri dev
 ```
 
+#### Android 版
+```bash
+npm run tauri android init
+npm run tauri android dev
+```
+
 ### 构建应用
+
+#### 桌面版
 ```bash
 npm run tauri build
+```
+
+#### Android 版
+```bash
+npm run tauri android build
+```
+
+## CI/CD
+
+本项目使用 GitHub Actions 进行持续集成和发布：
+
+- **CI 工作流** (`ci.yml`): 在每次 push 和 PR 时自动构建和测试
+  - Linux (Ubuntu 22.04)
+  - Windows (最新版)
+  - macOS (最新版)
+  - Android
+
+- **Release 工作流** (`release.yml`): 在创建版本标签时自动构建并发布
+  - 自动创建 GitHub Release
+  - 上传所有平台的安装包
+
+### 创建新版本
+```bash
+git tag v1.0.0
+git push origin v1.0.0
 ```
 
 ## 界面说明

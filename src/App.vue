@@ -178,7 +178,8 @@ async function convertToPdf() {
 
 function truncatePath(path, maxLength = 50) {
   if (path.length <= maxLength) return path;
-  return "..." + path.slice(-maxLength);
+  // Account for the ellipsis length when truncating
+  return "..." + path.slice(-(maxLength - 3));
 }
 
 function handleContextMenu(event, index) {

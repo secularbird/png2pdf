@@ -12,6 +12,9 @@ use ::image::DynamicImage;
 use ::image::GenericImageView;
 use ::image::ImageFormat;
 
+// Pixels to millimeters conversion factor (1 pixel ≈ 0.264583 mm at 96 DPI)
+const PX_TO_MM: f32 = 0.264583;
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ImageInfo {
     pub path: String,
@@ -64,8 +67,8 @@ fn convert_images_to_pdf(image_paths: Vec<String>, output_path: &str) -> Result<
     let (width, height) = first_img.dimensions();
     let (doc, page1, layer1) = PdfDocument::new(
         "Images to PDF",
-        Mm(width as f32 * 0.264583),
-        Mm(height as f32 * 0.264583),
+        Mm(width as f32 * PX_TO_MM),
+        Mm(height as f32 * PX_TO_MM),
         "Layer 1",
     );
 
@@ -81,8 +84,8 @@ fn convert_images_to_pdf(image_paths: Vec<String>, output_path: &str) -> Result<
     for img in images.iter().skip(1) {
         let (img_width, img_height) = img.dimensions();
         let (page, layer) = doc.add_page(
-            Mm(img_width as f32 * 0.264583),
-            Mm(img_height as f32 * 0.264583),
+            Mm(img_width as f32 * PX_TO_MM),
+            Mm(img_height as f32 * PX_TO_MM),
             "Layer 1",
         );
         add_image_to_layer(
@@ -128,8 +131,8 @@ fn add_image_to_layer(
         translate_x: Some(Mm(0.0)),
         translate_y: Some(Mm(0.0)),
         rotate: None,
-        scale_x: Some(width as f32 * 0.264583),
-        scale_y: Some(height as f32 * 0.264583),
+        scale_x: Some(width as f32 * PX_TO_MM),
+        scale_y: Some(height as f32 * PX_TO_MM),
         dpi: None,
     };
 

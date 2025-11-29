@@ -1,60 +1,87 @@
+# Images to PDF
+
 ## Introduction
-This is a desktop application based on `Tkinter` and `Pillow` for converting multiple images into a PDF file. Users can select images, adjust their order, preview them, and export them as a PDF file.
+A cross-platform desktop application built with Tauri 2 and Vue 3 for converting multiple images into a PDF file. Users can select images, adjust their order, preview images, and export them as a PDF file.
+
+## Tech Stack
+- **Backend**: Tauri 2 (Rust)
+- **Frontend**: Vue 3 + Vite
+- **Image Processing**: image-rs
+- **PDF Generation**: printpdf
 
 ## Features
-1. **Select/Add Images**  
-   - Supports selecting multiple images (PNG, JPG, JPEG, BMP, GIF).
-   - Allows adding images to the already selected list.
+1. **Select/Append Images**  
+   - Supports selecting multiple images (PNG, JPG, JPEG, BMP, GIF, WebP).
+   - Can append images to the existing list.
 
 2. **Delete Images**  
-   - Supports deleting selected images from the list.
+   - Supports removing selected images from the list.
 
 3. **Adjust Image Order**  
-   - Allows moving images up or down to adjust their order.
+   - Supports moving images up or down to adjust their order.
 
 4. **Image Preview**  
-   - Real-time preview of the selected image on the right canvas.
+   - Real-time preview of selected images in the right panel.
 
 5. **Convert to PDF**  
-   - Combines the selected images into a single PDF file in order and saves it.
+   - Merges selected images in order into a PDF file and saves it.
 
 6. **Context Menu**  
-   - Right-click on an image in the list to quickly delete it.
+   - Right-click on images in the list for quick deletion.
 
 7. **Status Bar**  
-   - Displays the current number of selected images.
+   - Displays the count of selected images.
 
-## Usage
-1. Click the **Select/Add Images** button to choose the images to convert.
-2. Adjust the order of images in the list or delete unnecessary ones.
-3. Preview the images on the right canvas.
-4. Click the **Convert to PDF** button, choose a save path, and generate the PDF file.
+8. **Multi-language Support**
+   - Automatically detects system language, supports Chinese and English.
+
+9. **Dark Mode**
+   - Automatically adapts to system dark/light theme.
 
 ## System Requirements
-- Python 3.x
-- Dependencies:
-  - `tkinter`
-  - `Pillow`
+- Windows 10/11
+- macOS 10.15+
+- Linux (WebKit2GTK required)
 
-## Install Dependencies
-Run the following command in the terminal to install the required dependencies:
+## Development Setup
+
+### Prerequisites
+- Node.js 18+
+- Rust 1.70+
+- System dependencies (Linux):
+  ```bash
+  sudo apt install libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev
+  ```
+
+### Install Dependencies
 ```bash
-pip install pillow
+npm install
 ```
 
-## Run the Program
-Run the following command in the terminal to start the program:
+### Development
 ```bash
-python main.py
+npm run tauri dev
+```
+
+### Build
+```bash
+npm run tauri build
 ```
 
 ## Interface Description
-- **Top Buttons**: For selecting/adding images and deleting images.
-- **Left List**: Displays the selected images and their order.
-- **Right Canvas**: For previewing the selected image.
-- **Bottom Button**: For converting images to a PDF.
-- **Status Bar**: Displays the number of selected images.
+- **Top Buttons**: For selecting/appending and deleting images.
+- **Left List**: Displays selected images and their order.
+- **Middle Buttons**: For adjusting image order.
+- **Right Panel**: For previewing selected images.
+- **Bottom Button**: For converting images to PDF.
+- **Status Bar**: Shows the number of selected images.
 
 ## Notes
-- Images will be merged into a PDF in the order they appear in the list.
-- If an image has a transparent background (RGBA mode), it will be automatically converted to RGB mode to ensure compatibility with the PDF format.
+- Images will be merged into PDF in the order shown in the list.
+- All images are automatically converted to RGB mode for PDF compatibility.
+
+## Recommended IDE Setup
+- [VS Code](https://code.visualstudio.com/) + [Vue - Official](https://marketplace.visualstudio.com/items?itemName=Vue.volar) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+
+## License
+MIT License
